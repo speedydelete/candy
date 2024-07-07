@@ -18,7 +18,7 @@ def client(func: Callable[[socket.socket], None], host: str, port: int, ipv6: bo
 #            host: str, port: int, ipv6: bool = False) -> None:
 #     pass
 
-def server(recv: Callable[[IO, dict], None | bool], send: Callable[[IO, dict], None], \
+def server(recv: Callable[[socket.socket, dict], None | bool], send: Callable[[socket.socket, dict], None], \
            host: str, port: int, ipv6: bool = False) -> None:
     sel = selectors.DefaultSelector()
     msock = socket.socket(socket.AF_INET6 if ipv6 else socket.AF_INET, socket.SOCK_STREAM)
@@ -31,9 +31,7 @@ def server(recv: Callable[[IO, dict], None | bool], send: Callable[[IO, dict], N
         while True:
             events = sel.select(None)
             for event, evtmask in events:
-                print(event.events, evtmask)
-                sock: IO = event.fileobj #type:ignore
-                print(sock, type(sock))
+                sock: socket.socket = event.fileobj #type:ignore
                 data = event.data
                 if data is None:
                     conn, addr = sock.accept() #type:ignore
